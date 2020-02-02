@@ -1,6 +1,8 @@
 package com.example.mess;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView Allready;
     private FirebaseAuth mAuth;
     private ProgressDialog loading;
+    private TextView chooseYourLanguage;
     private DatabaseReference RootRef;
 
     @Override
@@ -41,12 +44,37 @@ public class RegisterActivity extends AppCompatActivity {
                 SendUserToLoginActivity();
             }
         });
-        CreateAccountButton.setOnClickListener(new View.OnClickListener() {
+        CreateAccountButton.setOnClickListener(v -> CreateNewAccount());
+        chooseYourLanguage.setOnClickListener(view ->setUpLanguageDialog()); {
+
+        };
+    }
+
+    private void setUpLanguageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Name");
+        // set the custom layout
+        final View customLayout = getLayoutInflater().inflate(R.layout.dialog_language_picker, null);
+        builder.setView(customLayout);
+        // add a button
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                CreateNewAccount();
+            public void onClick(DialogInterface dialog, int which) {
+                // send data from the AlertDialog to the Activity
+
             }
         });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
     private void CreateNewAccount() {
@@ -94,6 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initializefields() {
+        chooseYourLanguage = findViewById(R.id.choose_language);
         CreateAccountButton = findViewById(R.id.register_button);
         UserEmail = findViewById(R.id.register_email);
         UserPassword = findViewById(R.id.register_password);
