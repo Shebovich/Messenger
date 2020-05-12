@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+<RadioGroup
+    android:id="@+id/languageGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+        <RadioButton
+            android:backgroundTint="@color/colorPrimary"
+            android:buttonTint="@color/colorPrimary"
+            android:id="@+id/russian_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Русский">
+
+
+        </RadioButton>
+
+        <RadioButton
+            android:backgroundTint="@color/colorPrimary"
+            android:buttonTint="@color/colorPrimary"
+            android:id="@+id/Deutsch_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deutsch">
+
+        </RadioButton>
+        <RadioButton
+            android:id="@+id/english_radio"
+            android:backgroundTint="@color/colorPrimary"
+            android:buttonTint="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="English"
+            >
+
+        </RadioButton>
+        <RadioButton
+            android:backgroundTint="@color/colorPrimary"
+            android:buttonTint="@color/colorPrimary"
+            android:id="@+id/french_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Français"
+            >
+
+        </RadioButton>
+        <RadioButton
+            android:backgroundTint="@color/colorPrimary"
+            android:buttonTint="@color/colorPrimary"
+            android:id="@+id/china_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="中國人"
+            >
+
+        </RadioButton>
+</RadioGroup>
+    </LinearLayout>
+</LinearLayout>

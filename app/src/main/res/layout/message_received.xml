@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:id="@+id/relativeLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="2dp"
+    >
+
+
+    <TextView
+        android:id="@+id/text_message_body_created"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/channel_created_shape"
+        android:maxWidth="240dp"
+        android:padding="8dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="hi man, how are you?"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="41dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/alllineShape"
+        android:layout_below="@+id/text_message_body_created"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+
+
+            android:id="@+id/image_message_profile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:layout_editor_absoluteY="32dp" />
+
+
+        <android.widget.Space
+            android:id="@+id/marginSpacer_beforeMessage"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="2dp"
+            app:layout_constraintStart_toEndOf="@id/image_message_profile" />
+
+        <ImageView
+            android:id="@+id/message_tail"
+            android:layout_width="14dp"
+
+
+            android:layout_height="13dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="0.5dp"
+
+            android:rotation="-90"
+            android:src="@drawable/tail_white"
+
+            app:layout_constraintBottom_toBottomOf="@id/Constraint"
+            app:layout_constraintStart_toStartOf="@+id/marginSpacer_beforeMessage" />
+
+        <ImageView
+            android:id="@+id/greenSquare"
+            android:layout_width="10dp"
+
+            android:layout_marginBottom="0.5dp"
+
+            android:layout_height="10dp"
+            android:src="@drawable/rectangle_white"
+            app:layout_constraintStart_toStartOf="@id/Constraint"
+            app:layout_constraintBottom_toBottomOf="@+id/Constraint"
+            app:layout_constraintStart_toEndOf="@+id/message_tail" />
+
+
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/Constraint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tg_shape_recieved"
+            android:layout_marginBottom="4dp"
+
+            app:layout_constraintStart_toEndOf="@id/marginSpacer_beforeMessage"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:maxWidth="280dp"
+
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/text_message_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="1"
+
+                    android:textColor="#1589FF"
+                    android:textSize="12dp"
+
+                    app:layout_constraintStart_toStartOf="@+id/Constraint"
+                    app:layout_constraintTop_toTopOf="@+id/Constraint" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:orientation="horizontal">
+
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/text_message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:maxWidth="240dp"
+                android:minWidth="60dp"
+                android:paddingStart="8dp"
+
+                android:paddingTop="8dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="8dp"
+                android:text=""
+                android:textColor="@color/black"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+            <ImageView
+                android:id="@+id/isEdited"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="2dp"
+                android:src="@drawable/ic_edit_black_24dp"
+
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/text_message_time" />
+
+            <TextView
+                android:id="@+id/text_message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="3dp"
+                android:maxLines="1"
+
+                android:text="14:42"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
