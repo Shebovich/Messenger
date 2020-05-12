@@ -1,8 +1,6 @@
 package com.example.mess;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Display;
@@ -12,9 +10,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
+
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.mess.Adapters.GroupChatMessagesAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -22,17 +30,30 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
+import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage;
+import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
+import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator;
+import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class GroupChatActivity extends AppCompatActivity {
     private Toolbar nToolbar;
     private ImageButton SendMessageButton;
     private EditText userMessageInput;
-    private ScrollView nScrollView;
+    private GroupChatMessagesAdapter adapter;
+    private RecyclerView recyclerView;
+    private List<GroupEntity> groupEntityList = new ArrayList<>();
+    private SessionManager sessionManager;
+    private RecyclerView.LayoutManager layoutManager;
+    private Map<String,Integer> translationsMap = new HashMap<>();
     private TextView displayTextMessages;
     private String currentGroupName, currentUserID,currentUserName,currentDate, currentTime;
     private FirebaseAuth mAuth;
@@ -42,6 +63,11 @@ public class GroupChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
+        sessionManager = new SessionManager(this);
+        translationsMap.put("en", FirebaseTranslateLanguage.EN);
+        translationsMap.put("ru", FirebaseTranslateLanguage.RU);
+        translationsMap.put("de", FirebaseTranslateLanguage.DE);
+        translationsMap.put("fr", FirebaseTranslateLanguage.FR);
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
 
@@ -59,7 +85,7 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
             public void onClick(View v) {
                 SaveMessageInfoToDatabase();
                 userMessageInput.setText("");
-                nScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+
             }
         });
     }
@@ -105,16 +131,55 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
 
     private void DisplayMessages(DataSnapshot dataSnapshot) {
 
-        Iterator iterator = dataSnapshot.getChildren().iterator();
-        while(iterator.hasNext())
-        {
-            String chatDate = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatMessage = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatName = (String) ((DataSnapshot)iterator.next()).getValue();
 
-            displayTextMessages.append(chatName + " :\n" + chatMessage + "\n"  + "   " + chatDate + "\n\n");
- nScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-        }
+            GroupEntity groupEntity = dataSnapshot.getValue(GroupEntity.class);
+            System.out.println("TIME TIME "+groupEntity.getTime());
+
+            FirebaseTranslatorOptions options =
+                    new FirebaseTranslatorOptions.Builder()
+                            .setSourceLanguage(translationsMap.get(groupEntity.getLanguage()))
+                            .setTargetLanguage(translationsMap.get(sessionManager.getLanguageUser()))
+                            .build();
+            final FirebaseTranslator translator =
+                    FirebaseNaturalLanguage.getInstance().getTranslator(options);
+            FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+                    .build();
+            translator.downloadModelIfNeeded(conditions)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void v) {
+                                    translator.translate(groupEntity.getMessage())
+                                            .addOnSuccessListener(
+                                                    new OnSuccessListener<String>() {
+                                                        @Override
+                                                        public void onSuccess(@NonNull String translatedText) {
+                                                            groupEntityList.add(groupEntity);
+                                                            adapter.notifyItemInserted(groupEntityList.size());
+
+                                                        }
+                                                    })
+                                            .addOnFailureListener(
+                                                    new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            // Error.
+                                                            // ...
+                                                        }
+                                                    });
+                                }
+                            })
+                    .addOnFailureListener(
+                            new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    // Model couldn’t be downloaded or other internal error.
+                                    // ...
+                                }
+                            });
+
+
+
     }
 
     private void SaveMessageInfoToDatabase() {
@@ -141,8 +206,9 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
             HashMap<String,Object> messageInfoMap = new HashMap<>();
             messageInfoMap.put("name", currentUserName);
             messageInfoMap.put("message", message);
-            messageInfoMap.put("date", currentDate);
-            messageInfoMap.put("time", currentTime);
+            messageInfoMap.put("time", System.currentTimeMillis());
+            messageInfoMap.put("language",sessionManager.getLanguageUser());
+            messageInfoMap.put("from",currentUserID);
             GroupMessageKeyRef.updateChildren(messageInfoMap);
 
 
@@ -177,8 +243,13 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
         getSupportActionBar().setTitle(currentGroupName);
         SendMessageButton = findViewById(R.id.send_button);
         userMessageInput = findViewById(R.id.input_group_message);
-        displayTextMessages = findViewById(R.id.group_chat_text_display);
-        nScrollView = findViewById(R.id.my_scroll_view);
+        recyclerView = findViewById(R.id.recyclerView);
+        adapter = new GroupChatMessagesAdapter(groupEntityList,this);
+        layoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,true);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(layoutManager);
+
+
 
     }
 }

@@ -4,16 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,7 +40,9 @@ private Button UpdateAccount;
 private EditText username,userstatus;
 private CircleImageView userProfileImage;
 private String currentUserID;
+private SessionManager sessionManager;
 private FirebaseAuth mAuth;
+private String languageUser;
 private DatabaseReference RootRef;
 private static final int GalleryPick =1;
 private StorageReference UserProfileImageRef;
@@ -51,10 +53,12 @@ private ProgressDialog loadingBar;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        sessionManager = new SessionManager(this);
         mAuth=FirebaseAuth.getInstance();
         currentUserID=mAuth.getCurrentUser().getUid();
         RootRef= FirebaseDatabase.getInstance().getReference();
-
+        Intent intent = getIntent();
+        languageUser = intent.getStringExtra("language");
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         InitializeFields();
         username.setVisibility(View.INVISIBLE);
@@ -80,6 +84,7 @@ private ProgressDialog loadingBar;
                     {
                         if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name") && (dataSnapshot.hasChild("image"))))
                         {
+
                             String retrieveUserName = dataSnapshot.child("name").getValue().toString();
                             String retrievesStatus = dataSnapshot.child("status").getValue().toString();
                             String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
@@ -129,6 +134,7 @@ private ProgressDialog loadingBar;
             HashMap<String,String> profilemap = new HashMap<>();
             profilemap.put("uid",currentUserID);
             profilemap.put("name",setUserName);
+            profilemap.put("language",sessionManager.getLanguageUser());
             profilemap.put("status",setUserStatus);
             RootRef.child("Users").child(currentUserID).setValue(profilemap)
                     .addOnCompleteListener(task -> {
