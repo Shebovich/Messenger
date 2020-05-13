@@ -157,19 +157,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-            <ImageView
-                android:id="@+id/isEdited"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-
-                android:layout_marginEnd="3dp"
-                android:layout_marginBottom="2dp"
-                android:src="@drawable/ic_edit_black_24dp"
-
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/text_message_time" />
-
             <TextView
                 android:id="@+id/text_message_time"
                 android:layout_width="wrap_content"

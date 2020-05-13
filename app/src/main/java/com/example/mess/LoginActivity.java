@@ -19,6 +19,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText UserEmail,UserPassword;
     private TextView NeedNewAccountLink, ForgetPasswordLink;
     private FirebaseAuth mAuth;
+    private DatabaseReference RootRef;
+    private String currentUser;
     private SessionManager sessionManager;
     private ProgressDialog loading;
 
@@ -74,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this,"Please enter email...",Toast.LENGTH_SHORT).show();
         }else
         {
+
             loading.setTitle("Sign in....");
             loading.setMessage("Please wait...");
             loading.setCanceledOnTouchOutside(true);
@@ -84,7 +93,9 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful())
                             {
-
+                                RootRef= FirebaseDatabase.getInstance().getReference();
+                                currentUser = mAuth.getCurrentUser().getUid();
+                                RetrieveUserInfo();
                                 SendUserToMainActivity();
                                 Toast.makeText(LoginActivity.this,"Logged in Succesful...",Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
@@ -121,5 +132,22 @@ public class LoginActivity extends AppCompatActivity {
     private void SendUserToRegisterActivity() {
         Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
         startActivity(intent);
+    }
+
+    private void RetrieveUserInfo()
+    {
+        RootRef.child("Users").child(currentUser)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        sessionManager.setLanguageUser(dataSnapshot.child("language").getValue().toString());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 }
