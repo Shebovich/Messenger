@@ -7,10 +7,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,10 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -38,7 +32,7 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
 
     private View groupFragmentView;
     private RecyclerView listView;
-    private List<GroupEntity> groupEntityList = new ArrayList<>();
+    private List<MessageEntity> messageEntityList = new ArrayList<>();
     private GroupAdapter arrayAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<String> list_of_groups = new ArrayList<>();
@@ -66,6 +60,8 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
         return groupFragmentView;
     }
 
+
+
     private void RetrieveAndDisplayGroups() {
         GroupRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -73,10 +69,10 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
 
                 Iterator interator = dataSnapshot.getChildren().iterator();
                 while (interator.hasNext()) {
-                    GroupEntity groupEntity = new GroupEntity();
-                    groupEntity.setDisplayName(((DataSnapshot) interator.next()).getKey());
-                    System.out.println(groupEntity.getDisplayName());
-                    groupEntityList.add(groupEntity);
+                    MessageEntity messageEntity = new MessageEntity();
+                    messageEntity.setDisplayName(((DataSnapshot) interator.next()).getKey());
+                    System.out.println(messageEntity.getDisplayName());
+                    messageEntityList.add(messageEntity);
                 }
 
                 arrayAdapter.notifyDataSetChanged();
@@ -93,15 +89,15 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
         listView = groupFragmentView.findViewById(R.id.list_view);
         layoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         listView.setLayoutManager(layoutManager);
-        arrayAdapter = new GroupAdapter(groupEntityList,getContext());
+        arrayAdapter = new GroupAdapter(messageEntityList,getContext());
         listView.setAdapter(arrayAdapter);
         arrayAdapter.setClickListner(this);
 
     }
 
     @Override
-    public void onItemClickListner(GroupEntity groupEntity, int position) {
-        String currentGroupName =groupEntityList.get(position).getDisplayName();
+    public void onItemClickListner(MessageEntity messageEntity, int position) {
+        String currentGroupName = messageEntityList.get(position).getDisplayName();
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("groupName", currentGroupName);
         startActivity(intent);

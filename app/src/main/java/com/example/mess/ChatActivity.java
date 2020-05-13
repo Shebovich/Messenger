@@ -23,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mess.Adapters.GroupChatMessagesAdapter;
 import com.example.mess.Messages;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,7 +51,7 @@ public class ChatActivity extends AppCompatActivity
 
     private TextView userName, userLastSeen;
     private CircleImageView userImage;
-
+    private SessionManager sessionManager;
     private Toolbar ChatToolBar;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
@@ -58,9 +59,9 @@ public class ChatActivity extends AppCompatActivity
     private ImageButton SendMessageButton, SendFilesButton;
     private EditText MessageInputText;
 
-    private final List<Messages> messagesList = new ArrayList<>();
+    private final List<MessageEntity> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
-    private MessageAdapter messageAdapter;
+    private GroupChatMessagesAdapter messageAdapter;
     private RecyclerView userMessagesList;
 
 
@@ -73,7 +74,7 @@ public class ChatActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
+        sessionManager = new SessionManager(this);
 
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
@@ -128,7 +129,7 @@ public class ChatActivity extends AppCompatActivity
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         MessageInputText = (EditText) findViewById(R.id.input_message);
 
-        messageAdapter = new MessageAdapter(messagesList);
+        messageAdapter = new GroupChatMessagesAdapter(messagesList, this);
         userMessagesList = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -192,7 +193,7 @@ public class ChatActivity extends AppCompatActivity
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s)
                     {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
+                        MessageEntity messages = dataSnapshot.getValue(MessageEntity.class);
 
                         messagesList.add(messages);
 
@@ -245,12 +246,11 @@ public class ChatActivity extends AppCompatActivity
 
             Map messageTextBody = new HashMap();
             messageTextBody.put("message", messageText);
-            messageTextBody.put("type", "text");
             messageTextBody.put("from", messageSenderID);
             messageTextBody.put("to", messageReceiverID);
+            messageTextBody.put("language",sessionManager.getLanguageUser());
             messageTextBody.put("messageID", messagePushID);
-            messageTextBody.put("time", saveCurrentTime);
-            messageTextBody.put("date", saveCurrentDate);
+            messageTextBody.put("time", System.currentTimeMillis());
 
             Map messageBodyDetails = new HashMap();
             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);

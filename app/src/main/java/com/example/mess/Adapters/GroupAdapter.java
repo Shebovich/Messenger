@@ -9,13 +9,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mess.GroupEntity;
+import com.example.mess.MessageEntity;
 import com.example.mess.R;
 
 import java.util.List;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
-    private List<GroupEntity> groupEntityList;
+    private List<MessageEntity> messageEntityList;
     private Context context;
     private ClickInterface clickInterface;
 
@@ -23,12 +23,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         this.clickInterface = clickListner;
     }
     public interface ClickInterface{
-        void onItemClickListner(GroupEntity groupEntity, int position);
+        void onItemClickListner(MessageEntity messageEntity, int position);
 
     }
 
-    public GroupAdapter(List<GroupEntity> groupEntityList, Context context){
-        this.groupEntityList = groupEntityList;
+    public GroupAdapter(List<MessageEntity> messageEntityList, Context context){
+        this.messageEntityList = messageEntityList;
         this.context = context;
     }
     @NonNull
@@ -42,12 +42,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, int position) {
-        holder.initView(groupEntityList.get(position));
+        holder.initView(messageEntityList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return groupEntityList.size();
+        return messageEntityList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -58,9 +58,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             this.itemView = itemView;
             groupName = itemView.findViewById(R.id.group_name);
         }
-        public void initView(GroupEntity groupEntity){
-            groupName.setText(groupEntity.getDisplayName());
-            itemView.setOnClickListener(view -> clickInterface.onItemClickListner(groupEntity,getAdapterPosition()));
+        public void initView(MessageEntity messageEntity){
+            groupName.setText(messageEntity.getDisplayName());
+            itemView.setOnClickListener(view -> clickInterface.onItemClickListner(messageEntity,getAdapterPosition()));
         }
 
 
