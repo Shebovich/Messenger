@@ -131,9 +131,13 @@ private ProgressDialog loadingBar;
         }
         else
         {
+            HashMap<String,String> tokenMap = new HashMap<>();
+            tokenMap.put("fcmToken",sessionManager.getFirebaseToken());
+            RootRef.child("FCMTokens").child(currentUserID).setValue(tokenMap);
             HashMap<String,String> profilemap = new HashMap<>();
             profilemap.put("uid",currentUserID);
             profilemap.put("name",setUserName);
+            profilemap.put("fcmToken",sessionManager.getFirebaseToken());
             profilemap.put("language",sessionManager.getLanguageUser());
             profilemap.put("status",setUserStatus);
             RootRef.child("Users").child(currentUserID).setValue(profilemap)

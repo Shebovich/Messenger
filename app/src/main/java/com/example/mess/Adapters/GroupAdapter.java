@@ -9,13 +9,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mess.Groups;
 import com.example.mess.MessageEntity;
 import com.example.mess.R;
 
 import java.util.List;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
-    private List<MessageEntity> messageEntityList;
+    private List<Groups> messageEntityList;
     private Context context;
     private ClickInterface clickInterface;
 
@@ -23,11 +24,11 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         this.clickInterface = clickListner;
     }
     public interface ClickInterface{
-        void onItemClickListner(MessageEntity messageEntity, int position);
+        void onItemClickListner(Groups messageEntity, int position);
 
     }
 
-    public GroupAdapter(List<MessageEntity> messageEntityList, Context context){
+    public GroupAdapter(List<Groups> messageEntityList, Context context){
         this.messageEntityList = messageEntityList;
         this.context = context;
     }
@@ -58,7 +59,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             this.itemView = itemView;
             groupName = itemView.findViewById(R.id.group_name);
         }
-        public void initView(MessageEntity messageEntity){
+        public void initView(Groups messageEntity){
             groupName.setText(messageEntity.getDisplayName());
             itemView.setOnClickListener(view -> clickInterface.onItemClickListner(messageEntity,getAdapterPosition()));
         }

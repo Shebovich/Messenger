@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mess.Adapters.GroupAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +34,7 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
 
     private View groupFragmentView;
     private RecyclerView listView;
-    private List<MessageEntity> messageEntityList = new ArrayList<>();
+    private List<Groups> messageEntityList = new ArrayList<>();
     private GroupAdapter arrayAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<String> list_of_groups = new ArrayList<>();
@@ -63,13 +65,13 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
 
 
     private void RetrieveAndDisplayGroups() {
-        GroupRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+        GroupRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Iterator interator = dataSnapshot.getChildren().iterator();
                 while (interator.hasNext()) {
-                    MessageEntity messageEntity = new MessageEntity();
+                    Groups messageEntity = new Groups();
                     messageEntity.setDisplayName(((DataSnapshot) interator.next()).getKey());
                     System.out.println(messageEntity.getDisplayName());
                     messageEntityList.add(messageEntity);
@@ -79,10 +81,27 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
             }
 
             @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+
+
     }
 
     private void InitializeFields() {
@@ -96,7 +115,7 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
     }
 
     @Override
-    public void onItemClickListner(MessageEntity messageEntity, int position) {
+    public void onItemClickListner(Groups messageEntity, int position) {
         String currentGroupName = messageEntityList.get(position).getDisplayName();
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("groupName", currentGroupName);
