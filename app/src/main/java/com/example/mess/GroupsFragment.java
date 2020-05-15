@@ -102,7 +102,7 @@ public class GroupsFragment extends Fragment implements GroupAdapter.ClickInterf
         });
 
 
-    }
+    }    
 
     private void InitializeFields() {
         listView = groupFragmentView.findViewById(R.id.list_view);
