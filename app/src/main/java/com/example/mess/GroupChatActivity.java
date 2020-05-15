@@ -3,6 +3,7 @@ package com.example.mess;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,14 +33,25 @@ import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class GroupChatActivity extends AppCompatActivity {
     private Toolbar nToolbar;
@@ -54,7 +66,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private TextView displayTextMessages;
     private String currentGroupName, currentUserID,currentUserName,currentDate, currentTime;
     private FirebaseAuth mAuth;
-    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
+    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, FCMTokens;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +83,10 @@ public class GroupChatActivity extends AppCompatActivity {
 
         mAuth= FirebaseAuth.getInstance();
 currentUserID = mAuth.getCurrentUser().getUid();
+
 UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
-
+FCMTokens = FirebaseDatabase.getInstance().getReference().child("FCMTokens");
 
 
 
@@ -166,6 +179,7 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
                                                         Collections.sort(messageEntityList);
                                                         Collections.reverse(messageEntityList);
                                                         adapter.notifyDataSetChanged();
+                                                        recyclerView.scrollToPosition(0);
                                                     })
                                             .addOnFailureListener(
                                                     e -> {
@@ -212,13 +226,61 @@ GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").chi
             messageInfoMap.put("message", message);
             messageInfoMap.put("time", System.currentTimeMillis());
             messageInfoMap.put("language",sessionManager.getLanguageUser());
-            messageInfoMap.put("from",currentUserID);
+            messageInfoMap.put("userId",currentUserID);
             GroupMessageKeyRef.updateChildren(messageInfoMap);
-
+            sendFirebaseNotification(messageInfoMap);
 
 
 
         }
+
+    }
+
+    private void sendFirebaseNotification(HashMap<String, Object> messageInfoMap)  {
+        List<String> listTokens = new ArrayList<>();
+
+        FCMTokens.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               for (DataSnapshot tokenSnapshot : dataSnapshot.getChildren()){
+                   FirebaseTokens firebaseTokens = tokenSnapshot.getValue(FirebaseTokens.class);
+                   listTokens.add(firebaseTokens.getFcmToken());
+               }
+
+                Map<String,Object> jsonParams = new HashMap<>();
+                jsonParams.put("data",messageInfoMap);
+
+
+
+                jsonParams.put("registration_ids",listTokens);
+                String key = "key=AAAAiD10lX0:APA91bHG8Jtmu4Nn2QSeti7tIoBQqp4d19zTWh5s7W3YALFL-fthkerimd1fRRRZVgdkZi4HlfJ5ad86toVIAtOU3dNK-q8LEHri7s4F5b6y275zgfAD_VMgW5DtQEvzUWzKBp-D-M9h";
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
+                NetworkService.getInstance()
+                        .getJSONApi()
+                        .sendPushMessage(body,key)
+                        .enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.isSuccessful()){
+                                    System.out.println("Succesfull");
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
 
     }
 

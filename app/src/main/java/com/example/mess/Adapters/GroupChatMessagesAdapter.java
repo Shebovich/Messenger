@@ -71,7 +71,7 @@ public class GroupChatMessagesAdapter extends  RecyclerView.Adapter<GroupChatMes
 
     @Override
     public int getItemViewType(int position) {
-        if (mAuth.getCurrentUser().getUid().equals(messagesList.get(position).getFrom())){
+        if (mAuth.getCurrentUser().getUid().equals(messagesList.get(position).getUserId())){
             return SENDED_MESSAGE;
         }else {
             return RECEIVED_MESSAGE;
@@ -144,7 +144,7 @@ public class GroupChatMessagesAdapter extends  RecyclerView.Adapter<GroupChatMes
         }
         public void setMessageName(MessageEntity messageEntity){
             messageName.setText(messageEntity.getName());
-            String fromUserID = messageEntity.getFrom();
+            String fromUserID = messageEntity.getUserId();
 
             usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserID);
 

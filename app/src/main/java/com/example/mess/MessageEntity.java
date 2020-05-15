@@ -6,19 +6,19 @@ public class MessageEntity implements Comparable<MessageEntity> {
     private String message;
     private String language;
     private Long time;
-    private String from;
+    private String userId;
     private String messageID;
     private String to;
     public MessageEntity(){
 
     }
 
-    public MessageEntity(String name, String message, String language, Long time, String from, String messageID){
+    public MessageEntity(String name, String message, String language, Long time, String userId, String messageID){
         this.name = name;
         this.message = message;
         this.language = language;
         this.time = time;
-        this.from = from;
+        this.userId = userId;
         this.messageID = messageID;
     }
 
@@ -62,12 +62,12 @@ public class MessageEntity implements Comparable<MessageEntity> {
         this.time = time;
     }
 
-    public String getFrom() {
-        return from;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -81,13 +81,5 @@ public class MessageEntity implements Comparable<MessageEntity> {
 
     public void setMessageID(String messageID) {
         this.messageID = messageID;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 }
